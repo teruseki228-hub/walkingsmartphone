@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>歩きスマホ・認知視野チャレンジ</title>
+<title>歩きスマホ・危険察知実験</title>
 <style>
 * {
   box-sizing: border-box;
@@ -50,7 +50,7 @@ button {
 }
 
 /* =========================
- START SCREEN (自律性・関係性の強化)
+ START SCREEN (自律性の強化 & ボタン変更)
 ========================= */
 #start-screen {
   display: flex;
@@ -92,7 +92,7 @@ button {
 }
 .instructions p:last-child { margin-bottom: 0; }
 
-/* 難易度・環境選択 (自律性) */
+/* 自律性：選択エリア */
 .mode-selection {
   margin-bottom: 15px;
   text-align: left;
@@ -101,6 +101,7 @@ button {
   font-size: 13px;
   color: #aeb7c8;
   margin-bottom: 8px;
+  font-weight: bold;
 }
 .mode-options {
   display: grid;
@@ -130,7 +131,7 @@ button {
   border-radius: 27px;
   background: linear-gradient(135deg, #ef476f, #f78c6c);
   color: white;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: bold;
   box-shadow: 0 6px 18px rgba(239,71,111,0.4);
 }
@@ -238,7 +239,7 @@ button {
 }
 
 /* =========================
- RESULT SCREEN (有能感・関係性の強化)
+ RESULT SCREEN
 ========================= */
 #result-screen {
   background: #111827;
@@ -339,20 +340,20 @@ button {
   <!-- ========================= START SCREEN ========================== -->
   <section id="start-screen" class="screen">
     <div class="start-header">
-      <span class="start-badge">認知視野セルフチェック</span>
+      <span class="start-badge">歩きスマホ危険察知実験</span>
       <h1>歩きスマホ中に<br>あなたの「視界」はどう変化する？</h1>
     </div>
 
     <div class="instructions">
-      <p><b>🔍 実験のねらい:</b> チャット返信に夢中になっている時、周囲の危険にどれだけ気づけるか<b>「自分の視野のクセ」</b>を体験・発見してみましょう。</p>
-      <p><b>📱 操作方法:</b><br>
-      ① 中央のスマホで友達に返信を行う<br>
-      ② 画面周辺に出現する危険（🚲🚗🚶）に気づいたら即タップ！</p>
+      <p><b>🔍 実験の目的:</b> チャット返信を行っている最中に、画面周辺の危険（自転車や歩行者）へどれだけ素早く気づけるかを検証します。</p>
+      <p><b>📱 実験手順:</b><br>
+      ① 中央のスマホで友達からのメッセージに返信する<br>
+      ② 画面の周辺に出現する危険アイコン（🚲🚗🚶⚠️）を見つけたら即タップ！</p>
     </div>
 
-    <!-- 自律性: モード・シチュエーション選択 -->
+    <!-- 自律性（Autonomy）: プレイヤー自身の選択権 -->
     <div class="mode-selection">
-      <div class="mode-title">▼ 挑戦する環境（シチュエーション）を選択:</div>
+      <div class="mode-title">▼ 実験を行う環境（シチュエーション）を選択:</div>
       <div class="mode-options">
         <button class="mode-btn active" onclick="selectMode('easy', this)">昼の住宅街<br><small>(標準)</small></button>
         <button class="mode-btn" onclick="selectMode('normal', this)">夕方の駅前<br><small>(やや混雑)</small></button>
@@ -360,7 +361,8 @@ button {
       </div>
     </div>
 
-    <button class="main-btn" onclick="startGame()">自分の認知視野を測定する</button>
+    <!-- 変更箇所：ボタンテキストを「実験を開始する」に変更 -->
+    <button class="main-btn" onclick="startGame()">実験を開始する</button>
   </section>
 
   <!-- ========================= GAME SCREEN ========================== -->
@@ -373,7 +375,7 @@ button {
     <canvas id="game-canvas"></canvas>
 
     <div id="phone-frame">
-      <div id="phone-header">LINE（返信中）</div>
+      <div id="phone-header">メッセージ（返信中）</div>
       <div id="chat-body">
         <div class="chat-bubble">友達：今どこ？そろそろ着く？</div>
       </div>
@@ -385,9 +387,9 @@ button {
   <section id="result-screen" class="screen hidden">
     <div class="result-inner">
       <div style="text-align: center;">
-        <span class="type-badge" id="user-type-badge">診断中...</span>
+        <span class="type-badge" id="user-type-badge">分析中...</span>
       </div>
-      <div class="result-title">あなたの認知視野タイプ</div>
+      <div class="result-title">実験結果と認知傾向</div>
 
       <div class="result-card">
         <div class="result-score-container">
@@ -406,23 +408,21 @@ button {
         </div>
       </div>
 
-      <!-- 有能感: フィードバック分析 -->
       <div class="analysis-box" id="analysis-text">
         結果を分析中...
       </div>
 
       <div style="font-size: 12px; color: #aaa; text-align: center; margin-top: 10px;">
-        ▼ あなたの意識が向いていた領域（ヒートマップ）
+        ▼ 発生した危険の検知／見落とし位置（ヒートマップ）
       </div>
       <canvas id="heatmap-canvas" width="360" height="200"></canvas>
 
-      <!-- 関係性: 研究・社会的貢献度のフィードバック -->
       <div class="contribution-note">
-        🌱 <b>社会貢献への協力感謝:</b><br>
-        あなたのデータは「歩きスマホ事故を減らす都市・UI設計」の研究成果として活用されます。
+        🌱 <b>ご協力ありがとうございます:</b><br>
+        このデータは「歩きスマホ事故を防止する教育指導案・UI設計」の客観的検証に役立てられます。
       </div>
 
-      <button class="retry-btn" onclick="location.reload()">もう一度別の環境で挑戦する</button>
+      <button class="retry-btn" onclick="location.reload()">もう一度実験する</button>
     </div>
   </section>
 </div>
@@ -458,7 +458,7 @@ let spawnInterval = null;
 let canvas, ctx;
 let hazards = [];
 let allHazardsHistory = [];
-let popups = []; // 視覚フィードバック用エフェクト
+let popups = [];
 let detectedHazards = 0;
 let currentCombo = 0;
 let maxCombo = 0;
@@ -567,7 +567,7 @@ function handleChatReply(text) {
 }
 
 /* =========================================================
- 危険生成 & タップ（有能感：即時フィードバック）
+ 危険生成 & タップ
 ========================================================= */
 function spawnHazard() {
   if (!gameRunning || !canvas) return;
@@ -627,7 +627,6 @@ function handlePointer(e) {
       if (currentCombo > maxCombo) maxCombo = currentCombo;
       hit = true;
 
-      // 視覚的エフェクト追加 (有能感の演出)
       popups.push({
         x: h.x, y: h.y - 10,
         text: currentCombo > 1 ? `NICE! ${currentCombo}COMBO` : "SAFE!",
@@ -642,7 +641,6 @@ function handlePointer(e) {
     document.getElementById("combo-display").innerText = `${currentCombo} COMBO`;
     navigator.vibrate?.(25);
   } else {
-    // コンボリセット
     currentCombo = 0;
     document.getElementById("combo-display").innerText = `0 COMBO`;
   }
@@ -656,11 +654,9 @@ function gameLoop() {
   const rect = canvas.getBoundingClientRect();
   ctx.clearRect(0, 0, rect.width, rect.height);
 
-  // 背景
   ctx.fillStyle = "#2d3e50";
   ctx.fillRect(0, 0, rect.width, rect.height);
 
-  // 危険要素描画
   hazards.forEach(h => {
     h.life--;
     if (h.detected || h.life <= 0) return;
@@ -676,7 +672,6 @@ function gameLoop() {
     ctx.fillText(h.icon, h.x, h.y);
   });
 
-  // ポップアップ演出描画
   popups.forEach((p, index) => {
     p.y -= 1;
     p.life--;
@@ -692,7 +687,7 @@ function gameLoop() {
 }
 
 /* =========================================================
- 結果分析 & タイプ診断（有能感の多角的判定）
+ 結果分析
 ========================================================= */
 function endGame() {
   gameRunning = false;
@@ -707,22 +702,21 @@ function endGame() {
   document.getElementById("max-combo-val").innerText = maxCombo;
   document.getElementById("chat-count").innerText = chatReplies;
 
-  // タイプ判定ロジック (ポジティブかつ内発的動機を刺激)
   let userType = "";
   let analysis = "";
 
   if (rate >= 75) {
-    userType = "🛡️ 危機回避エキスパート";
-    analysis = `素晴らしい認知能力です！チャットを行いながらも、周辺の視覚情報を素早く処理できています。この調子で実際の路上でも広視野を維持しましょう。`;
+    userType = "🛡️ 危険察知エキスパート";
+    analysis = `優れた注意配分です！チャットを行いながらも周辺の危険を高い精度で察知できています。この注意保持能力を実際の路面でも活用しましょう。`;
   } else if (chatReplies >= 5 && rate >= 40) {
-    userType = "💬 マルチタスク挑戦型";
-    analysis = `チャット返信を素早くこなしつつ、${detected}個の危険をキャッチしました！画面集中時の「一瞬の見落とし」に意識を向けることで、より完璧な安全視野が手に入ります。`;
+    userType = "💬 チャット応答重視型";
+    analysis = `迅速にチャットへ返信しつつ、${detected}個の危険を検知しました。メッセージ入力中は画面周辺への注意が遅れやすくなる傾向が確認できます。`;
   } else if (rate < 40) {
-    userType = "🔍 集中ゾーン型（スマホ没頭タイプ）";
-    analysis = `画面への没頭度が高く、周辺視野が狭まる「トンネル視野」の傾向が発見できました！これは人間として自然な現象です。「返信は立ち止まって行う」工夫が自分を守る鍵になります。`;
+    userType = "🔍 スマホ没頭タイプ（トンネル視野）";
+    analysis = `画面中央へ強力に注意が惹きつけられ、視野が狭まる傾向が見られました。これは人間として自然な反応であり、「歩行中の操作を控える」ことの重要性を示す結果です。`;
   } else {
-    userType = "👀 バランス探求型";
-    analysis = `状況に応じた反応ができています！もう一度別の環境（難易度）を選択して、自分の視野の変化を検証してみましょう。`;
+    userType = "👀 バランス測定型";
+    analysis = `状況に応じた反応が見られました。別の環境（シチュエーション）を選択して再挑戦することで、条件による見落としの違いを比較できます。`;
   }
 
   document.getElementById("user-type-badge").innerText = userType;
@@ -744,7 +738,6 @@ function drawHeatmap() {
   hctx.fillStyle = "#111827";
   hctx.fillRect(0, 0, w, h);
 
-  // スマホ枠
   hctx.strokeStyle = "#4b5563";
   hctx.strokeRect(w / 2 - 40, h - 70, 80, 65);
   hctx.fillStyle = "#9ca3af";
