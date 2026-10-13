@@ -50,90 +50,59 @@ button {
 }
 
 /* =========================
- START SCREEN (自律性の強化 & ボタン変更)
+ START SCREEN
 ========================= */
 #start-screen {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 24px 20px;
+  padding: 28px 20px;
   text-align: center;
   overflow-y: auto;
 }
 .start-header {
-  margin-top: 10px;
+  margin-top: 15px;
 }
 .start-badge {
   display: inline-block;
   background: rgba(239, 71, 111, 0.2);
   color: #ef476f;
-  padding: 4px 12px;
+  padding: 4px 14px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: bold;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 #start-screen h1 {
-  font-size: 24px;
-  line-height: 1.3;
+  font-size: 25px;
+  line-height: 1.35;
 }
 .instructions {
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 16px;
-  padding: 16px;
+  padding: 20px;
   text-align: left;
-  margin: 15px 0;
+  margin: 20px 0;
 }
 .instructions p {
-  font-size: 13px;
-  line-height: 1.6;
-  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 12px;
 }
 .instructions p:last-child { margin-bottom: 0; }
 
-/* 自律性：選択エリア */
-.mode-selection {
-  margin-bottom: 15px;
-  text-align: left;
-}
-.mode-title {
-  font-size: 13px;
-  color: #aeb7c8;
-  margin-bottom: 8px;
-  font-weight: bold;
-}
-.mode-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-}
-.mode-btn {
-  background: rgba(255,255,255,0.08);
-  border: 2px solid transparent;
-  border-radius: 12px;
-  padding: 10px 4px;
-  color: #ccc;
-  font-size: 12px;
-  font-weight: bold;
-  transition: all 0.2s;
-}
-.mode-btn.active {
-  border-color: #ef476f;
-  background: rgba(239, 71, 111, 0.15);
-  color: white;
-}
-
 .main-btn {
   width: 100%;
-  min-height: 54px;
+  min-height: 56px;
   border: none;
-  border-radius: 27px;
+  border-radius: 28px;
   background: linear-gradient(135deg, #ef476f, #f78c6c);
   color: white;
   font-size: 18px;
   font-weight: bold;
   box-shadow: 0 6px 18px rgba(239,71,111,0.4);
+  margin-bottom: 10px;
 }
 
 /* =========================
@@ -351,17 +320,6 @@ button {
       ② 画面の周辺に出現する危険アイコン（🚲🚗🚶⚠️）を見つけたら即タップ！</p>
     </div>
 
-    <!-- 自律性（Autonomy）: プレイヤー自身の選択権 -->
-    <div class="mode-selection">
-      <div class="mode-title">▼ 実験を行う環境（シチュエーション）を選択:</div>
-      <div class="mode-options">
-        <button class="mode-btn active" onclick="selectMode('easy', this)">昼の住宅街<br><small>(標準)</small></button>
-        <button class="mode-btn" onclick="selectMode('normal', this)">夕方の駅前<br><small>(やや混雑)</small></button>
-        <button class="mode-btn" onclick="selectMode('hard', this)">雨の交差点<br><small>(ハイペース)</small></button>
-      </div>
-    </div>
-
-    <!-- 変更箇所：ボタンテキストを「実験を開始する」に変更 -->
     <button class="main-btn" onclick="startGame()">実験を開始する</button>
   </section>
 
@@ -439,18 +397,7 @@ const questions = [
   { q: "この後カラオケ行かない？", opts: ["行く！楽しみ", "今日は帰るね", "何人で行く？"] }
 ];
 
-let selectedMode = 'easy';
-let spawnIntervalTime = 1600;
-
-function selectMode(mode, btn) {
-  selectedMode = mode;
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  if (mode === 'easy') spawnIntervalTime = 1600;
-  if (mode === 'normal') spawnIntervalTime = 1200;
-  if (mode === 'hard') spawnIntervalTime = 900;
-}
-
+const spawnIntervalTime = 1400; // 危険アイコンの出現間隔 (ミリ秒)
 const GAME_TIME = 30;
 let gameTimer = GAME_TIME;
 let timerInterval = null;
@@ -716,7 +663,7 @@ function endGame() {
     analysis = `画面中央へ強力に注意が惹きつけられ、視野が狭まる傾向が見られました。これは人間として自然な反応であり、「歩行中の操作を控える」ことの重要性を示す結果です。`;
   } else {
     userType = "👀 バランス測定型";
-    analysis = `状況に応じた反応が見られました。別の環境（シチュエーション）を選択して再挑戦することで、条件による見落としの違いを比較できます。`;
+    analysis = `状況に応じた反応が見られました。再挑戦することで自分の注意傾向の変化を検証できます。`;
   }
 
   document.getElementById("user-type-badge").innerText = userType;
