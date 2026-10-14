@@ -188,27 +188,30 @@ button {
   align-self: flex-end;
   background: #dcf8c6;
 }
+
+/* 選択肢ボタンのエリア */
 #chat-options {
-  padding: 10px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   background: #eee;
 }
-.single-reply-btn {
+.option-btn {
   width: 100%;
-  min-height: 46px;
+  min-height: 38px;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   background: #128c7e;
   color: white;
-  font-size: 15px;
+  font-size: 12px;
   font-weight: bold;
-  box-shadow: 0 3px 8px rgba(18,140,126,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+  padding: 6px 8px;
+  touch-action: manipulation;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-.single-reply-btn:active {
-  background: #0e6b60;
+.option-btn:active {
+  background: #0b766b;
   transform: scale(0.98);
 }
 
@@ -321,8 +324,8 @@ button {
     <div class="instructions">
       <p><b>🔍 実験の目的:</b> スマホでチャット返信を行っている最中に、画面周辺の危険（自転車や歩行者）へどれだけ素早く気づけるかを検証します。</p>
       <p><b>📱 実験手順:</b><br>
-      ① スマホ下の「返信する」ボタンをタップして会話を進める<br>
-      ② 画面の周辺に出現する危険アイコン（🚲🚗🚶⚠️）を見つけたら即タップ！</p>
+      ① スマホ画面の選択肢から返信を選んで会話を進める<br>
+      ② 画面の周辺に出現する危険マーク（🚲🚗🚶⚠️）を見つけたら即タップ！</p>
     </div>
 
     <button class="main-btn" onclick="startGame()">実験を開始する</button>
@@ -376,9 +379,9 @@ button {
       </div>
 
       <div style="font-size: 12px; color: #aaa; text-align: center; margin-top: 10px;">
-        ▼ 発生した危険の検知／見落とし位置（ヒートマップ）
+        ▼ 危険の発生位置と「見落とし領域（✖）」
       </div>
-      <canvas id="heatmap-canvas" width="360" height="200"></canvas>
+      <canvas id="heatmap-canvas" width="360" height="210"></canvas>
 
       <div class="contribution-note">
         🌱 <b>ご協力ありがとうございます:</b><br>
@@ -392,14 +395,29 @@ button {
 
 <script>
 /* =========================================================
- データ & 設定（単一返信文）
+ データ & 設定（選択肢の復元）
 ========================================================= */
 const questions = [
-  { q: "今どこ？そろそろ着く？", reply: "あと5分で着く！" },
-  { q: "課題の締め切りって今日だっけ？", reply: "今日23:59までだよ！" },
-  { q: "夕飯何食べる？ラーメンにする？", reply: "いいね！ラーメン行こう！" },
-  { q: "来週のゼミのパワポできた？", reply: "今作ってる最中！" },
-  { q: "この後カラオケ行かない？", reply: "行く！楽しみ！" }
+  {
+    q: "今どこ？そろそろ着く？",
+    opts: ["あと5分で着く！", "今電車の中！", "ごめん遅れる！"]
+  },
+  {
+    q: "課題の締め切りって今日だっけ？",
+    opts: ["明日だよ！", "今日23:59まで！", "わからない…"]
+  },
+  {
+    q: "夕飯何食べる？ラーメンにする？",
+    opts: ["いいね！ラーメン！", "カフェが良いな", "何でもいいよ！"]
+  },
+  {
+    q: "来週のゼミのパワポできた？",
+    opts: ["今作ってる最中！", "まだ全然できてない", "バッチリ完了！"]
+  },
+  {
+    q: "この後カラオケ行かない？",
+    opts: ["行く！楽しみ！", "今日は帰るね", "何人で行くの？"]
+  }
 ];
 
 const spawnIntervalTime = 1400;
@@ -473,7 +491,7 @@ function resizeCanvas() {
 }
 
 /* =========================================================
- チャット処理（ワンタップ返信）
+ チャット処理（複数選択肢）
 ========================================================= */
 function loadQuestion(index) {
   if (!gameRunning) return;
@@ -490,12 +508,15 @@ function loadQuestion(index) {
   chatBody.appendChild(bubble);
   chatBody.scrollTop = chatBody.scrollHeight;
 
+  // 複数の選択肢ボタンを動的生成
   options.innerHTML = "";
-  const btn = document.createElement("button");
-  btn.className = "single-reply-btn";
-  btn.innerText = "💬 メッセージを返信する";
-  btn.addEventListener("click", () => handleChatReply(q.reply));
-  options.appendChild(btn);
+  q.opts.forEach(text => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.innerText = text;
+    btn.addEventListener("click", () => handleChatReply(text));
+    options.appendChild(btn);
+  });
 }
 
 function handleChatReply(replyText) {
@@ -510,7 +531,7 @@ function handleChatReply(replyText) {
   chatReplies++;
   chatBody.scrollTop = chatBody.scrollHeight;
 
-  options.innerHTML = '<div style="font-size:12px;color:#777;text-align:center;padding:12px;">送信中...</div>';
+  options.innerHTML = '<div style="font-size:11px;color:#777;text-align:center;padding:8px;">送信中...</div>';
   setTimeout(() => {
     if (gameRunning) loadQuestion(currentQuestionIndex + 1);
   }, 350);
@@ -552,8 +573,9 @@ function spawnHazard() {
     id: Date.now() + Math.random(),
     x: x, y: y,
     icon: type.icon,
-    radius: 26,
+    radius: 28,
     life: 140,
+    maxLife: 140,
     detected: false
   };
   hazards.push(hazard);
@@ -597,7 +619,7 @@ function handlePointer(e) {
 }
 
 /* =========================================================
- 描画ループ
+ 描画ループ（高輝度・見やすい危険マーク）
 ========================================================= */
 function gameLoop() {
   if (!gameRunning) return;
@@ -611,21 +633,37 @@ function gameLoop() {
     h.life--;
     if (h.detected || h.life <= 0) return;
 
+    // 1. 目立つ黄色背景円
     ctx.beginPath();
     ctx.arc(h.x, h.y, h.radius, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(239, 71, 111, 0.3)";
+    ctx.fillStyle = "#ffea00";
     ctx.fill();
 
-    ctx.font = "28px Arial";
+    // 2. 赤色のくっきり枠線
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#ff0055";
+    ctx.stroke();
+
+    // 3. パルスリング（危険の存在をアニメーションで主張）
+    const pulseRadius = h.radius + ((h.maxLife - h.life) % 20) * 0.8;
+    ctx.beginPath();
+    ctx.arc(h.x, h.y, pulseRadius, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(255, 0, 85, 0.6)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 4. 絵文字アイコン描画
+    ctx.font = "bold 26px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(h.icon, h.x, h.y);
   });
 
-  popups.forEach((p, index) => {
+  // ポップアップ描画
+  popups.forEach((p) => {
     p.y -= 1;
     p.life--;
-    ctx.font = "bold 14px Arial";
+    ctx.font = "bold 15px Arial";
     ctx.fillStyle = p.color;
     ctx.textAlign = "center";
     ctx.fillText(p.text, p.x, p.y);
@@ -657,13 +695,13 @@ function endGame() {
 
   if (rate >= 75) {
     userType = "🛡️ 危険察知エキスパート";
-    analysis = `優れた注意配分です！チャット操作を行いながらも周辺の危険を高い精度で察知できています。この注意保持能力を実際の路面でも活用しましょう。`;
+    analysis = `優れた注意配分です！チャット返信を行いながらも周辺の危険を高い精度で察知できています。`;
   } else if (chatReplies >= 6 && rate >= 40) {
     userType = "💬 チャット操作集中型";
-    analysis = `素早くチャットを更新しつつ、${detected}個の危険を検知しました。操作中は画面周辺への注意が遅れやすくなる傾向が確認できます。`;
+    analysis = `素早くチャットを更新しつつ、${detected}個の危険を検知しました。選択肢を考えている間、周辺視野の危険が見落とされやすくなる傾向が見られます。`;
   } else if (rate < 40) {
     userType = "🔍 スマホ没頭タイプ（トンネル視野）";
-    analysis = `画面中央へ強力に注意が惹きつけられ、視野が狭まる傾向が見られました。これは人間として自然な反応であり、「歩行中の操作を控える」ことの重要性を示す結果です。`;
+    analysis = `画面中央への没頭度が高く、視野が狭まる傾向が見られました。下のマップで**「見落とした位置（✖）」**を確認してみましょう。`;
   } else {
     userType = "👀 バランス測定型";
     analysis = `状況に応じた反応が見られました。再挑戦することで自分の注意傾向の変化を検証できます。`;
@@ -678,35 +716,71 @@ function endGame() {
 }
 
 /* =========================================================
- ヒートマップ描画
+ 見落とし位置がクッキリ見えるマップ描画
 ========================================================= */
 function drawHeatmap() {
   const hm = document.getElementById("heatmap-canvas");
   const hctx = hm.getContext("2d");
   const w = hm.width, h = hm.height;
 
+  // 背景
   hctx.fillStyle = "#111827";
   hctx.fillRect(0, 0, w, h);
 
+  // 道路・背景枠
+  hctx.fillStyle = "#1f2937";
+  hctx.fillRect(w * 0.1, 0, w * 0.8, h);
+
+  // スマホ位置ガイド
   hctx.strokeStyle = "#4b5563";
-  hctx.strokeRect(w / 2 - 40, h - 70, 80, 65);
+  hctx.strokeRect(w / 2 - 45, h - 65, 90, 55);
   hctx.fillStyle = "#9ca3af";
-  hctx.font = "10px Arial";
+  hctx.font = "11px Arial";
   hctx.textAlign = "center";
-  hctx.fillText("スマホ位置", w / 2, h - 35);
+  hctx.fillText("スマホ画面", w / 2, h - 35);
 
   if (!canvas) return;
   const rect = canvas.getBoundingClientRect();
 
+  // 全危険プロット
   allHazardsHistory.forEach(hz => {
     const x = (hz.x / rect.width) * w;
     const y = (hz.y / rect.height) * h;
 
-    hctx.beginPath();
-    hctx.arc(x, y, 5, 0, Math.PI * 2);
-    hctx.fillStyle = hz.detected ? "#06d4a0" : "#ef476f";
-    hctx.fill();
+    if (hz.detected) {
+      // 【検知成功】小さな緑色の点
+      hctx.beginPath();
+      hctx.arc(x, y, 6, 0, Math.PI * 2);
+      hctx.fillStyle = "#06d4a0";
+      hctx.fill();
+    } else {
+      // 【見落とし】大きな赤い✖印と警告リングで強調表示
+      hctx.beginPath();
+      hctx.arc(x, y, 10, 0, Math.PI * 2);
+      hctx.fillStyle = "rgba(239, 71, 111, 0.25)";
+      hctx.fill();
+
+      hctx.beginPath();
+      hctx.arc(x, y, 8, 0, Math.PI * 2);
+      hctx.strokeStyle = "#ef476f";
+      hctx.lineWidth = 2;
+      hctx.stroke();
+
+      hctx.font = "bold 11px Arial";
+      hctx.fillStyle = "#ff2a55";
+      hctx.textAlign = "center";
+      hctx.textBaseline = "middle";
+      hctx.fillText("✖", x, y);
+    }
   });
+
+  // 凡例（レジェンド）の表示
+  hctx.font = "bold 11px Arial";
+  hctx.textAlign = "left";
+  hctx.fillStyle = "#06d4a0";
+  hctx.fillText("● 検知成功", 12, 18);
+  hctx.fillStyle = "#ef476f";
+  hctx.fillText("✖ 見落とした位置", 90, 18);
 }
 
 window.addEventListener("resize", () => { if (gameRunning) resizeCanvas(); });
